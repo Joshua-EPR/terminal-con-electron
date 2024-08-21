@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Terminal</title>
+  <style>
+    body { 
+      font-family: monospace; 
+      margin: 0; 
+      padding: 0; 
+      overflow: auto; 
+    }
+    pre { 
+      background: #000; 
+      color: #0f0; 
+      padding: 10px; 
+      margin: 0; 
+      height: 100%; 
+      overflow-y: auto; 
+      min-height: 100vh;
+    }
+    input { 
+      width: 100%; 
+      padding: 10px; 
+      color: #0f0;  
+      box-sizing: border-box; 
+      border: none; 
+      outline: none; 
+      position: fixed; 
+      bottom: 0; 
+      background-color: transparent; 
+    }
+  </style>
+</head>
+<body>
+  <pre id="output"></pre>
+  <input type="text" id="input" placeholder="Type a command..." autofocus />
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const outputElement = document.getElementById('output');
+    const inputElement = document.getElementById('input');
+
+    ipcRenderer.on('terminal-output', (event, data) => {
+      outputElement.textContent += data;
+      outputElement.scrollTop = outputElement.scrollHeight;
+    });
+
+    inputElement.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        const command = inputElement.value;
+        ipcRenderer.send('terminal-input', command);
+        inputElement.value = '';
+      }
+    });
+  </script>
+</body>
+</html>
